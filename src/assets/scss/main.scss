@@ -1,0 +1,22 @@
+@import 'variables';
+
+.container {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 15px;
+
+  h1 {
+    font-weight: 700;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background-clip: text;
+  }
+}
