@@ -1,4 +1,4 @@
-export type ProjectStatus = "active" | "in_progress" | "completed";
+export type ProjectStatus = "active" | "in_progress" | "completed" | "";
 export type TaskStatus = "todo" | "in_progress" | "done";
 
 export interface Project {

@@ -1,0 +1,6 @@
+@mixin glass-card {
+  background: $bg-glass;
+  backdrop-filter: blur(12px);
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+}

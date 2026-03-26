@@ -1,11 +1,12 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { projectsApi } from "@/api/projects.ts";
-import type { Project } from "@/types";
+import type { Project, ProjectStatus } from "@/types";
 
 export const useProjectsStore = defineStore("projects", () => {
   const projects = ref<Project[]>([]);
   const loading = ref(false);
+  const filterStatus = ref<ProjectStatus | "">("");
 
   const fetchProjects = async () => {
     loading.value = true;
@@ -42,12 +43,18 @@ export const useProjectsStore = defineStore("projects", () => {
       loading.value = false;
     }
   };
+  const setFilterStatus = (value: ProjectStatus | "") => {
+    console.log(value, "setFilterStatus value");
+    filterStatus.value = value;
+  };
 
   return {
     projects,
     loading,
+    filterStatus,
     fetchProjects,
     createProject,
     deleteProject,
+    setFilterStatus,
   };
 });

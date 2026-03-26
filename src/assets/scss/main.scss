@@ -1,22 +1,106 @@
-@import 'variables';
+@use 'variables.scss' as *;
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-5;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $accent-gradient;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: $bg-glass;
+  color: $text-primary;
+  border: 1px solid $border-color;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: $border-color-active;
+  }
+}
+
+@mixin button-danger {
+  @include button-base;
+  background: $danger;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: $danger-hover;
+  }
+}
+
+body {
+  background: $bg-primary;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+a {
+  color: $accent-primary;
+  text-decoration: none;
+
+  &:hover {
+    color: $accent-primary-hover;
+  }
+}
 
 .container {
   max-width: $breakpoint-xl;
   margin: 0 auto;
-  padding: 0;
+  padding: $space-6;
 }
 
 .page-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: $space-8;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: $space-4;
 
   h1 {
+    font-size: $font-size-3xl;
     font-weight: 700;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: $accent-gradient;
     background-clip: text;
   }
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+.btn-danger {
+  @include button-danger;
 }
