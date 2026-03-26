@@ -38,10 +38,9 @@ export const useProjectsStore = defineStore("projects", () => {
 
   const fetchProjects = async () => {
     loading.value = true;
-
     try {
       const { data } = await projectsApi.getAll();
-      projects.value = data;
+      projects.value = applySavedOrder(data, "projects-row-order");
     } catch (error) {
       console.error("Failed to fetch projects", error);
     } finally {
@@ -49,14 +48,11 @@ export const useProjectsStore = defineStore("projects", () => {
     }
   };
 
-  const applySavedOrder = <T extends { id: string | number }>(
-    items: T[],
-    storageKey: string,
-  ): T[] => {
+  const applySavedOrder = <T extends { id: string }>(items: T[], storageKey: string): T[] => {
     try {
       const saved = localStorage.getItem(storageKey);
       if (!saved) return items;
-      const orderIds: (string | number)[] = JSON.parse(saved);
+      const orderIds: string[] = JSON.parse(saved);
       const map = new Map(items.map((item) => [item.id, item]));
       const ordered: T[] = [];
       for (const id of orderIds) {
@@ -76,15 +72,11 @@ export const useProjectsStore = defineStore("projects", () => {
   };
 
   const createProject = async (payload: Omit<Project, "id">) => {
-    loading.value = true;
     try {
       const { data } = await projectsApi.create(payload);
       projects.value.push(data);
-      return data;
     } catch (error) {
       console.error("Failed to create project", error);
-    } finally {
-      loading.value = false;
     }
   };
 
@@ -92,11 +84,11 @@ export const useProjectsStore = defineStore("projects", () => {
     let result = [...projects.value];
 
     if (filterName.value) {
-      const q = filterName.value.toLowerCase();
-      result = result.filter((p) => p.name.toLowerCase().includes(q));
+      const filtName = filterName.value.toLowerCase();
+      result = result.filter((project) => project.name.toLowerCase().includes(filtName));
     }
     if (filterStatus.value) {
-      result = result.filter((p) => p.status === filterStatus.value);
+      result = result.filter((project) => project.status === filterStatus.value);
     }
 
     if (sortKey.value && sortOrder.value) {
@@ -121,7 +113,7 @@ export const useProjectsStore = defineStore("projects", () => {
   const updateProject = async (id: string, payload: Partial<Project>) => {
     try {
       const { data } = await projectsApi.update(id, payload);
-      const idExist = projects.value.findIndex((p) => p.id === id);
+      const idExist = projects.value.findIndex((project) => project.id === id);
       if (idExist !== -1) projects.value[idExist] = data;
       return data;
     } catch (err) {
@@ -130,14 +122,11 @@ export const useProjectsStore = defineStore("projects", () => {
   };
 
   const deleteProject = async (id: string) => {
-    loading.value = true;
     try {
       await projectsApi.delete(id);
-      projects.value.filter((project) => project.id !== id);
+      projects.value = projects.value.filter((project) => project.id !== id);
     } catch (error) {
       console.error("Failed to delete project", error);
-    } finally {
-      loading.value = false;
     }
   };
 
@@ -163,11 +152,7 @@ export const useProjectsStore = defineStore("projects", () => {
     writeSettingsToLocalstorage();
   };
 
-  const updateProjectStats = async (
-    projectId: string,
-    count: number,
-    status: ProjectStatus,
-  ) => {
+  const updateProjectStats = async (projectId: string, count: number, status: ProjectStatus) => {
     const project = projects.value.find((proj) => proj.id === projectId);
     if (project) {
       project.taskCount = count;
@@ -175,7 +160,7 @@ export const useProjectsStore = defineStore("projects", () => {
       try {
         await projectsApi.update(projectId, { status, taskCount: count });
       } catch (error) {
-        console.error("Failed to update ProjectStats", error);
+        console.error("Failed to updateProjectStats", error);
       }
     }
   };
@@ -186,8 +171,9 @@ export const useProjectsStore = defineStore("projects", () => {
     filterStatus,
     sortKey,
     sortOrder,
-    fetchProjects,
+    filterName,
     filteredAndSortedProjects,
+    fetchProjects,
     applySavedOrder,
     createProject,
     updateProject,

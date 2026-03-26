@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { projectsApi } from "@/api/projects.ts";
 import { tasksApi } from "@/api/tasks.ts";
 import { useProjectsStore } from "@/stores/projects.ts";
 import type { Project, ProjectStatus, Task } from "@/types";
@@ -11,14 +10,16 @@ import { useRouter } from "vue-router";
 import DataTable from "@/components/DataTable.vue";
 import { formatDate } from "@/helpers";
 import StatusBadge from "@/components/StatusBadge.vue";
+import StatsChart from "@/components/StatsChart.vue";
 
+const router = useRouter();
 const projectsStore = useProjectsStore();
-const allTasks = ref<Task[]>([]);
+
 const showModal = ref(false);
 const showDeleteModal = ref(false);
 const editingProject = ref<Project | null>(null);
 const projectToDelete = ref<Project | null>(null);
-const router = useRouter();
+const allTasks = ref<Task[]>([]);
 
 onMounted(async () => {
   try {
@@ -29,18 +30,6 @@ onMounted(async () => {
     console.error("onMounted error occurred", error);
   }
 });
-
-const handleCreate = async (data: { name: string; description: string }) => {
-  await projectsStore.createProject({
-    name: data.name,
-    description: data.description,
-    status: "active",
-    createdAt: new Date().toISOString().split("T")[0],
-    taskCount: 0,
-  });
-
-  showModal.value = false;
-};
 
 const handleReorder = (rows: Project[]) => {
   projectsStore.reorderProjects(rows);
@@ -78,10 +67,7 @@ const executeDelete = async () => {
   }
 };
 
-const handleCreateOrUpdate = async (data: {
-  name: string;
-  description: string;
-}) => {
+const handleCreateOrUpdate = async (data: { name: string; description: string }) => {
   if (editingProject.value) {
     await projectsStore.updateProject(editingProject.value.id, {
       name: data.name,
@@ -106,7 +92,11 @@ const handleCreateOrUpdate = async (data: {
       <button @click="openAddProject" class="btn-primary">+ Add Project</button>
     </div>
 
-    <div class="stats-section">
+    <div class="stats-section" v-if="allTasks.length">
+      <div class="stats-card">
+        <h3>Tasks Data</h3>
+        <StatsChart :tasks="allTasks" />
+      </div>
       <div class="stats-numbers">
         <div class="stat-item">
           <span class="stat-value">{{ projectsStore.projects.length }}</span>
@@ -139,22 +129,13 @@ const handleCreateOrUpdate = async (data: {
 
     <div class="filters-bar">
       <div class="filter-group">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle
-            cx="7"
-            cy="7"
-            r="5"
-            stroke="currentColor"
-            stroke-width="1.5"
-          />
-          <path
-            d="M11 11l3 3"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-        </svg>
-        <input type="text" placeholder="Search by name..." />
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          placeholder="Search by name..."
+          :value="projectsStore.filterName"
+          @input="projectsStore.setFilterName(($event.target as HTMLInputElement).value)"
+        />
       </div>
       <div class="filter-group">
         <select
@@ -221,26 +202,16 @@ const handleCreateOrUpdate = async (data: {
       :title="editingProject ? 'Edit Project' : 'New Project'"
       @close="closeModal"
     >
-      <ProjectForm
-        :editing="editingProject"
-        @submit="handleCreateOrUpdate"
-        @cancel="closeModal"
-      />
+      <ProjectForm :editing="editingProject" @submit="handleCreateOrUpdate" @cancel="closeModal" />
     </AppModal>
-    <AppModal
-      :show="showDeleteModal"
-      title="Delete Project"
-      @close="showDeleteModal = false"
-    >
+    <AppModal :show="showDeleteModal" title="Delete Project" @close="showDeleteModal = false">
       <div class="delete-confirmation">
         <p>
           Are you sure to delete
           <strong>{{ projectToDelete!.name }}</strong> project?
         </p>
         <div class="delete-confirmation-actions">
-          <button class="btn-secondary" @click="showDeleteModal = false">
-            Cancel
-          </button>
+          <button class="btn-secondary" @click="showDeleteModal = false">Cancel</button>
           <button class="btn-danger" @click="executeDelete">Delete</button>
         </div>
       </div>

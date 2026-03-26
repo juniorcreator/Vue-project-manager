@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { projectsApi } from "@/api/projects.ts";
-import { useProjectsStore } from "@/stores/projects.ts";
-import { useRouter } from "vue-router";
-import type { SortOrder, TableColumn } from "@/types";
 import { computed, reactive, ref, watch } from "vue";
+import type { SortOrder, TableColumn } from "@/types";
 import { useSortable } from "@vueuse/integrations/useSortable";
 
 const props = defineProps<{
@@ -28,16 +25,23 @@ const savedWidths: Record<string, number> = {};
 if (props.storageKey) {
   try {
     const saved = localStorage.getItem(`col-widths-${props.storageKey}`);
+    console.log(saved);
     if (saved) Object.assign(savedWidths, JSON.parse(saved));
   } catch (err) {
     console.error("Failed to ger col-widths", err);
   }
 }
-const router = useRouter();
+const columnsState = reactive(
+  props.columns.map((column) => ({
+    ...column,
+    width: savedWidths[column.key] ?? column.width ?? 150,
+  })),
+);
 const currentSortOrder = computed(() => props.sortOrder);
-const projectsStore = useProjectsStore();
+console.log(currentSortOrder, "currentSortOrder");
 const localRows = ref<T[]>([...props.rows]) as import("vue").Ref<T[]>;
 const tbodyRef = ref<HTMLElement | null>(null);
+console.log(columnsState, " columnsState");
 
 useSortable(tbodyRef, ref([]), {
   handle: ".drag-handle",
@@ -45,12 +49,10 @@ useSortable(tbodyRef, ref([]), {
   ghostClass: "ghost",
   onEnd: (evt: any) => {
     const { oldIndex, newIndex, item } = evt;
-    if (
-      oldIndex === undefined ||
-      newIndex === undefined ||
-      oldIndex === newIndex
-    )
+
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
       return;
+    }
 
     const parent = item.parentNode;
     if (parent) {
@@ -61,8 +63,8 @@ useSortable(tbodyRef, ref([]), {
       }
     }
 
-    // Mutate state manually
     const newRows = [...localRows.value];
+    console.log(newRows, " newRows");
     const [moved] = newRows.splice(oldIndex, 1);
     newRows.splice(newIndex, 0, moved);
 
@@ -72,12 +74,14 @@ useSortable(tbodyRef, ref([]), {
 console.log(localRows.value, " localRows");
 watch(
   () => props.rows,
-  (newVal) => {
-    console.log(newVal, "watch newVal on props.rows");
-    localRows.value = newVal;
+  (newRows) => {
+    console.log(newRows, "watch newRows on props.rows");
+    localRows.value = [...newRows];
   },
 );
-
+const rowKey = (row: T): string | number => {
+  return row[(props.rowKeyField as keyof T) || ("id" as keyof T)] as string;
+};
 const toggleSort = (key: string) => {
   let newOrder: SortOrder = "asc";
   if (props.sortKey === key) {
@@ -86,53 +90,39 @@ const toggleSort = (key: string) => {
   }
   emit("sort", key, newOrder);
 };
-const rowKey = (row: T): string | number => {
-  return row[(props.rowKeyField as keyof T) || ("id" as keyof T)] as
-    | string
-    | number;
+
+let resizeIndex = -1;
+let startX = 0;
+let startWidth = 0;
+
+const startResize = (e: MouseEvent, index: number) => {
+  resizeIndex = index;
+  startX = e.clientX;
+  startWidth = columnsState[index].width;
+  document.addEventListener("mousemove", onResize);
+  document.addEventListener("mouseup", stopResize);
 };
-const onDragEnd = () => {
-  emit("reorder", [...localRows.value]);
-};
-const columnsState = reactive(
-  props.columns.map((c) => ({
-    ...c,
-    width: savedWidths[c.key] ?? c.width ?? 150,
-  })),
-);
+
 const saveColumnWidths = () => {
   if (!props.storageKey) return;
   const widths: Record<string, number> = {};
   for (const col of columnsState) {
     widths[col.key] = col.width;
   }
-  localStorage.setItem(
-    `col-widths-${props.storageKey}`,
-    JSON.stringify(widths),
-  );
+  localStorage.setItem(`col-widths-${props.storageKey}`, JSON.stringify(widths));
 };
+
 const onResize = (e: MouseEvent) => {
-  if (resizeIdx < 0) return;
+  if (resizeIndex < 0) return;
   const diff = e.clientX - startX;
-  const minW = columnsState[resizeIdx].minWidth || 80;
-  columnsState[resizeIdx].width = Math.max(minW, startWidth + diff);
+  const minWidth = columnsState[resizeIndex].minWidth || 80;
+  columnsState[resizeIndex].width = Math.max(minWidth, startWidth + diff);
 };
 const stopResize = () => {
-  resizeIdx = -1;
+  resizeIndex = -1;
   document.removeEventListener("mousemove", onResize);
   document.removeEventListener("mouseup", stopResize);
   saveColumnWidths();
-};
-
-let resizeIdx = -1;
-let startX = 0;
-let startWidth = 0;
-const startResize = (e: MouseEvent, idx: number) => {
-  resizeIdx = idx;
-  startX = e.clientX;
-  startWidth = columnsState[idx].width;
-  document.addEventListener("mousemove", onResize);
-  document.addEventListener("mouseup", stopResize);
 };
 </script>
 
@@ -142,11 +132,9 @@ const startResize = (e: MouseEvent, idx: number) => {
       <table class="data-table">
         <thead>
           <tr>
-            <th
-              v-if="isDraggable"
-              class="col-drag"
-              style="width: 40px; min-width: 40px"
-            ></th>
+            <th class="col-drag" style="width: 20px">
+              <i class="pi pi-arrows-v"></i>
+            </th>
             <th
               v-for="(col, index) in columnsState"
               :key="col.key"
@@ -155,56 +143,19 @@ const startResize = (e: MouseEvent, idx: number) => {
                 minWidth: (col.minWidth || 80) + 'px',
               }"
               :class="{ sortable: col.sortable, sorted: sortKey === col.key }"
-              @click="col.sortable && toggleSort(col.key)"
             >
-              <div class="th-content">
+              <div @click="col.sortable && toggleSort(col.key)" class="th-content">
                 <span>{{ col.label }}</span>
                 <span v-if="col.sortable" class="sort-icon">
-                  <svg
+                  <i
                     v-if="sortKey === col.key && currentSortOrder === 'asc'"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                  >
-                    <path
-                      d="M7 3v8M3 7l4-4 4 4"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <svg
-                    v-else-if="
-                      sortKey === col.key && currentSortOrder === 'desc'
-                    "
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                  >
-                    <path
-                      d="M7 11V3M3 7l4 4 4-4"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <svg
-                    v-else
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    class="sort-neutral"
-                  >
-                    <path
-                      d="M5 6l2-2 2 2M5 8l2 2 2-2"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
+                    class="pi pi-sort-up"
+                  ></i>
+                  <i
+                    v-else-if="sortKey === col.key && currentSortOrder === 'desc'"
+                    class="pi pi-sort-down"
+                  ></i>
+                  <i v-else class="pi pi-sort"></i>
                 </span>
               </div>
               <div
@@ -224,20 +175,7 @@ const startResize = (e: MouseEvent, idx: number) => {
             @click="$emit('rowClick', element)"
           >
             <td v-if="isDraggable" class="col-drag drag-handle">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                opacity="0.4"
-              >
-                <circle cx="6" cy="4" r="1.5" />
-                <circle cx="10" cy="4" r="1.5" />
-                <circle cx="6" cy="8" r="1.5" />
-                <circle cx="10" cy="8" r="1.5" />
-                <circle cx="6" cy="12" r="1.5" />
-                <circle cx="10" cy="12" r="1.5" />
-              </svg>
+              <i class="pi pi-sort-alt-slash"></i>
             </td>
             <td
               v-for="col in columnsState"
@@ -247,11 +185,7 @@ const startResize = (e: MouseEvent, idx: number) => {
                 minWidth: (col.minWidth || 80) + 'px',
               }"
             >
-              <slot
-                :name="'cell-' + col.key"
-                :row="element"
-                :value="element[col.key]"
-              >
+              <slot :name="'cell-' + col.key" :row="element" :value="element[col.key]">
                 {{ element[col.key] }}
               </slot>
             </td>
@@ -272,6 +206,32 @@ const startResize = (e: MouseEvent, idx: number) => {
 .data-table-wrapper {
   @include glass-card;
   overflow-x: hidden;
+}
+
+.col-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 1;
+
+  &:after {
+    content: "";
+    position: absolute;
+    right: 2px;
+    top: 15%;
+    bottom: 15%;
+    width: 3px;
+    background: $border-color;
+    border-radius: 1px;
+    transition: background 150ms ease;
+  }
+
+  &:hover::after {
+    background: $accent-primary;
+  }
 }
 
 .table-scroll {
@@ -322,6 +282,16 @@ const startResize = (e: MouseEvent, idx: number) => {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .col-drag {
+    width: 40px;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .th-content {
+    display: inline-block;
+  }
 }
 
 .table-row {
@@ -340,9 +310,19 @@ const startResize = (e: MouseEvent, idx: number) => {
   }
 }
 
-.col-drag {
-  width: 40px;
-  min-width: 40px;
+.table-empty {
   text-align: center;
+  padding: $space-10;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}
+
+:deep(.ghost) {
+  opacity: 0.4;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+:deep(.sortable-chosen) {
+  background: $bg-card-hover;
 }
 </style>
