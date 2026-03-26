@@ -3,19 +3,26 @@ import { ref, onMounted } from "vue";
 import { projectsApi } from "@/api/projects.ts";
 import { tasksApi } from "@/api/tasks.ts";
 import { useProjectsStore } from "@/stores/projects.ts";
-import type { ProjectStatus, Task } from "@/types";
+import type { Project, ProjectStatus, Task } from "@/types";
 import { columns } from "@/constants/table.ts";
 import AppModal from "@/components/AppModal.vue";
 import ProjectForm from "@/components/ProjectForm.vue";
+import { useRouter } from "vue-router";
+import DataTable from "@/components/DataTable.vue";
+import { formatDate } from "@/helpers";
+import StatusBadge from "@/components/StatusBadge.vue";
 
 const projectsStore = useProjectsStore();
 const allTasks = ref<Task[]>([]);
-const showModal = ref(true);
+const showModal = ref(false);
+const showDeleteModal = ref(false);
+const editingProject = ref<Project | null>(null);
+const projectToDelete = ref<Project | null>(null);
+const router = useRouter();
 
 onMounted(async () => {
-  await projectsStore.fetchProjects();
-
   try {
+    await projectsStore.fetchProjects();
     const { data } = await tasksApi.getAll();
     allTasks.value = data;
   } catch (error) {
@@ -34,12 +41,69 @@ const handleCreate = async (data: { name: string; description: string }) => {
 
   showModal.value = false;
 };
+
+const handleReorder = (rows: Project[]) => {
+  projectsStore.reorderProjects(rows);
+};
+
+const goToProject = (row: Project) => {
+  router.push(`/projects/${row.id}`);
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  editingProject.value = null;
+};
+
+const openAddProject = () => {
+  editingProject.value = null;
+  showModal.value = true;
+};
+
+const openEditProject = (project: Project) => {
+  editingProject.value = project;
+  showModal.value = true;
+};
+
+const confirmDelete = (project: Project) => {
+  projectToDelete.value = project;
+  showDeleteModal.value = true;
+};
+
+const executeDelete = async () => {
+  if (projectToDelete.value) {
+    await projectsStore.deleteProject(projectToDelete.value.id);
+    showDeleteModal.value = false;
+    projectToDelete.value = null;
+  }
+};
+
+const handleCreateOrUpdate = async (data: {
+  name: string;
+  description: string;
+}) => {
+  if (editingProject.value) {
+    await projectsStore.updateProject(editingProject.value.id, {
+      name: data.name,
+      description: data.description,
+    });
+  } else {
+    await projectsStore.createProject({
+      name: data.name,
+      description: data.description,
+      status: "active",
+      createdAt: new Date().toISOString().split("T")[0],
+      taskCount: 0,
+    });
+  }
+  closeModal();
+};
 </script>
 <template>
   <div class="projects-page container">
     <div class="page-header">
       <h1>Projects</h1>
-      <button>Add Project</button>
+      <button @click="openAddProject" class="btn-primary">+ Add Project</button>
     </div>
 
     <div class="stats-section">
@@ -114,23 +178,72 @@ const handleCreate = async (data: { name: string; description: string }) => {
       <p>loading projects...</p>
     </div>
 
-    <div class="data-table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>move</th>
-            <th v-for="column in columns" :key="column.key">
-              <div>
-                <span>{{ column.label }}</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
-      </table>
-    </div>
+    <DataTable
+      v-else
+      :columns="columns"
+      :rows="projectsStore.filteredAndSortedProjects"
+      :sort-key="projectsStore.sortKey"
+      :sort-order="projectsStore.sortOrder"
+      storage-key="projects-table"
+      :is-draggable="true"
+      @sort="(key, order) => projectsStore.setSort(key, order)"
+      @reorder="handleReorder"
+      @row-click="goToProject"
+    >
+      <template #cell-status="{ value }">
+        <StatusBadge :status="value" />
+      </template>
+      <template #cell-createdAt="{ value }">
+        {{ formatDate(value) }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="actions-group">
+          <button
+            @click.stop="openEditProject(row as Project)"
+            class="btn-icon text-primary"
+            title="Edit Project"
+          >
+            <i class="pi pi-file-edit"></i>
+          </button>
+          <button
+            @click.stop="confirmDelete(row as Project)"
+            class="btn-icon text-danger"
+            title="Delete Project"
+          >
+            <i class="pi pi-delete-left"></i>
+          </button>
+        </div>
+      </template>
+    </DataTable>
 
-    <AppModal :show="showModal" title="New Project" @close="showModal = false">
-      <ProjectForm @submit="handleCreate" @cancel="showModal = false" />
+    <AppModal
+      :show="showModal"
+      :title="editingProject ? 'Edit Project' : 'New Project'"
+      @close="closeModal"
+    >
+      <ProjectForm
+        :editing="editingProject"
+        @submit="handleCreateOrUpdate"
+        @cancel="closeModal"
+      />
+    </AppModal>
+    <AppModal
+      :show="showDeleteModal"
+      title="Delete Project"
+      @close="showDeleteModal = false"
+    >
+      <div class="delete-confirmation">
+        <p>
+          Are you sure to delete
+          <strong>{{ projectToDelete!.name }}</strong> project?
+        </p>
+        <div class="delete-confirmation-actions">
+          <button class="btn-secondary" @click="showDeleteModal = false">
+            Cancel
+          </button>
+          <button class="btn-danger" @click="executeDelete">Delete</button>
+        </div>
+      </div>
     </AppModal>
   </div>
 </template>

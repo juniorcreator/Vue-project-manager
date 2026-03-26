@@ -19,16 +19,7 @@ const sizeClass = `modal-${props.size || "md"}`;
         <div v-if="show" class="modal-content" :class="sizeClass">
           <div class="modal-header">
             <h2>{{ title }}</h2>
-            <button class="modal-close">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M15 5L5 15M5 5l10 10"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
+            <button @click.self="$emit('close')" class="modal-close">X</button>
           </div>
           <div class="modal-body">
             <slot />
@@ -93,11 +84,12 @@ const sizeClass = `modal-${props.size || "md"}`;
 }
 
 .modal-close {
+  font-size: $font-size-lg;
   background: none;
   border: none;
   color: $text-muted;
   cursor: pointer;
-  padding: $space-1;
+  padding: $space-3;
   border-radius: $radius-sm;
   transition: all 150ms ease;
   display: flex;

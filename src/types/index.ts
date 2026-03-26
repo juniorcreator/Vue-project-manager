@@ -2,7 +2,7 @@ export type ProjectStatus = "active" | "in_progress" | "completed" | "";
 export type TaskStatus = "todo" | "in_progress" | "done";
 
 export interface Project {
-  id: string | number;
+  id: string;
   name: string;
   description: string;
   status: ProjectStatus;
@@ -11,8 +11,8 @@ export interface Project {
 }
 
 export interface Task {
-  id: string | number;
-  projectId: string | number;
+  id: string;
+  projectId: string;
   title: string;
   assignee: string;
   status: TaskStatus;
@@ -27,3 +27,5 @@ export interface TableColumn {
   width?: number;
   minWidth?: number;
 }
+
+export type SortOrder = "asc" | "desc" | null;

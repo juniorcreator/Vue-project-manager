@@ -22,5 +22,5 @@ export const columns = [
     width: 150,
     minWidth: 120,
   },
-  { key: "actions", label: "", sortable: true, width: 40, minWidth: 30 },
+  { key: "actions", label: "Actions", sortable: true, width: 60, minWidth: 50 },
 ];

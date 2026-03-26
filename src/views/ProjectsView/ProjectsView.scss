@@ -1,5 +1,44 @@
 @use "@/assets/scss/variables" as *;
 
+.btn-icon {
+  background: none;
+  font-size: $font-size-base;
+  cursor: pointer;
+  padding: $space-2;
+  border: none;
+  border-radius: $radius-sm;
+  transition: all  150ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &.text-primary:hover {
+    color: $accent-primary;
+    background: rgba($accent-primary, 0.1);
+  }
+
+  &.text-danger:hover {
+    color: $danger;
+    background: rgba($danger, 0.1);
+  }
+}
+
+.text-danger-muted {
+  color: rgba($danger, 0.8);
+  font-size: $font-size-sm;
+  margin-top: $space-2;
+}
+
+.actions-group {
+  display: flex;
+  gap: $space-1;
+}
+
 .projects-page {
   padding-top: $space-10;
   padding-bottom: $space-10;
@@ -99,6 +138,7 @@ select {
     letter-spacing: 0.5px;
   }
 }
+
 .loading {
   display: flex;
   flex-direction: column;
