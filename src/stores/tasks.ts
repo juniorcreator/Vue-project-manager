@@ -117,12 +117,18 @@ export const useTasksStore = defineStore("tasks", () => {
     try {
       const { data } = await tasksApi.getByProject(projectId);
       if (data) {
+        console.log(data, " data  tasks");
         tasks.value = applySavedOrder(data, `tasks-row-order-${projectId}`);
       } else {
         console.error("No tasks found...");
       }
-    } catch (error) {
-      console.error("Failed to fetch tasks", error);
+    } catch (error: any) {
+      tasks.value = [];
+      if (error?.response?.status === 404) {
+        console.log(`No tasks found for project ${projectId}`);
+      } else {
+        console.error("Failed to fetch tasks:", error);
+      }
     } finally {
       loading.value = false;
     }

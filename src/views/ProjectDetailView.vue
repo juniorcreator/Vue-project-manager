@@ -50,8 +50,6 @@ onMounted(async () => {
       console.error("Failed to fetch project:", e);
     }
   }
-  console.log(projectName.value, " projectName.value");
-  console.log(projectDesc.value, " projectDesc.value");
 });
 
 const handleReorder = (rows: Task[]) => {
