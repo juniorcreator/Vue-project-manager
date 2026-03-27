@@ -24,3 +24,11 @@ export const columns = [
   },
   { key: "actions", label: "Actions", sortable: true, width: 60, minWidth: 50 },
 ];
+export const tasksColumns = [
+  { key: "id", label: "ID", sortable: true, width: 70, minWidth: 50 },
+  { key: "title", label: "Task Name", sortable: true, width: 280, minWidth: 150 },
+  { key: "assignee", label: "Assignee", sortable: true, width: 140, minWidth: 100 },
+  { key: "status", label: "Status", sortable: true, width: 140, minWidth: 120 },
+  { key: "dueDate", label: "Due Date", sortable: true, width: 140, minWidth: 110 },
+  { key: "actions", label: "", sortable: false, width: 60, minWidth: 60 },
+];

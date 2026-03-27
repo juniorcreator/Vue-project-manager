@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { projectsApi } from "@/api/projects.ts";
 import type { Project, ProjectStatus, SortOrder } from "@/types";
+import { applySavedOrder } from "@/utils/storage.ts";
 
 export const useProjectsStore = defineStore("projects", () => {
   const projects = ref<Project[]>([]);
@@ -45,29 +46,6 @@ export const useProjectsStore = defineStore("projects", () => {
       console.error("Failed to fetch projects", error);
     } finally {
       loading.value = false;
-    }
-  };
-
-  const applySavedOrder = <T extends { id: string }>(items: T[], storageKey: string): T[] => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (!saved) return items;
-      const orderIds: string[] = JSON.parse(saved);
-      const map = new Map(items.map((item) => [item.id, item]));
-      const ordered: T[] = [];
-      for (const id of orderIds) {
-        const item = map.get(id);
-        if (item) {
-          ordered.push(item);
-          map.delete(id);
-        }
-      }
-      for (const item of map.values()) {
-        ordered.push(item);
-      }
-      return ordered;
-    } catch {
-      return items;
     }
   };
 
@@ -174,7 +152,6 @@ export const useProjectsStore = defineStore("projects", () => {
     filterName,
     filteredAndSortedProjects,
     fetchProjects,
-    applySavedOrder,
     createProject,
     updateProject,
     deleteProject,

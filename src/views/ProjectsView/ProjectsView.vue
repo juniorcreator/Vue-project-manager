@@ -8,9 +8,9 @@ import AppModal from "@/components/AppModal.vue";
 import ProjectForm from "@/components/ProjectForm.vue";
 import { useRouter } from "vue-router";
 import DataTable from "@/components/DataTable.vue";
-import { formatDate } from "@/helpers";
 import StatusBadge from "@/components/StatusBadge.vue";
 import StatsChart from "@/components/StatsChart.vue";
+import { formatDate } from "@/utils/formatters.ts";
 
 const router = useRouter();
 const projectsStore = useProjectsStore();

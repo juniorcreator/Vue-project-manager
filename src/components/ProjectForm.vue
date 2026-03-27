@@ -68,7 +68,7 @@ const handleSubmit = () => {
       ></textarea>
     </div>
     <div class="form-actions">
-      <button type="button" class="btn-secondary">Cancel</button>
+      <button @click.self="$emit('cancel')" type="button" class="btn-secondary">Cancel</button>
       <button type="submit" class="btn-primary">
         {{ editing ? "Update Project" : "Create Project" }}
       </button>
