@@ -117,7 +117,6 @@ export const useTasksStore = defineStore("tasks", () => {
     try {
       const { data } = await tasksApi.getByProject(projectId);
       if (data) {
-        console.log(data, " data  tasks");
         tasks.value = applySavedOrder(data, `tasks-row-order-${projectId}`);
       } else {
         console.error("No tasks found...");

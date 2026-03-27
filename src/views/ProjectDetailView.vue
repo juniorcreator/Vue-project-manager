@@ -11,6 +11,7 @@ import AppModal from "@/components/AppModal.vue";
 import TaskForm from "@/components/TaskForm.vue";
 import DataTable from "@/components/DataTable.vue";
 import StatusBadge from "@/components/StatusBadge.vue";
+import KanbanBoard from "@/components/KanbanBoard.vue";
 import { formatDate } from "@/utils/formatters.ts";
 
 const route = useRoute();
@@ -182,8 +183,12 @@ const executeDeleteTask = async () => {
       </DataTable>
     </template>
     <template v-else>
-      <h1>11111</h1>
-      <h3>kanbana</h3>
+      <KanbanBoard
+        :tasks="tasksStore.tasks"
+        @update-tasks="handleKanbanUpdate"
+        @edit-task="openEditTask"
+        @delete-task="confirmDeleteTask"
+      />
     </template>
 
     <AppModal :show="showTaskModal" :title="editingTask ? 'Edit Task' : 'Add Task'" @close="closeTaskModal">

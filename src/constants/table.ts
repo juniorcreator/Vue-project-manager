@@ -1,3 +1,5 @@
+import type { TaskStatus } from "@/types";
+
 export const columns = [
   { key: "id", label: "ID", sortable: true, width: 50, minWidth: 20 },
   {
@@ -31,4 +33,9 @@ export const tasksColumns = [
   { key: "status", label: "Status", sortable: true, width: 140, minWidth: 120 },
   { key: "dueDate", label: "Due Date", sortable: true, width: 140, minWidth: 110 },
   { key: "actions", label: "", sortable: false, width: 60, minWidth: 60 },
+];
+export const kanbanColumns = [
+  { status: "todo" as TaskStatus, label: "To Do" },
+  { status: "in_progress" as TaskStatus, label: "In Progress" },
+  { status: "done" as TaskStatus, label: "Done" },
 ];
