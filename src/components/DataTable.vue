@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, any>">
 import { computed, reactive, ref, watch } from "vue";
 import type { SortOrder, TableColumn } from "@/types";
 import { useSortable } from "@vueuse/integrations/useSortable";
@@ -147,10 +147,7 @@ const stopResize = () => {
               <div @click="col.sortable && toggleSort(col.key)" class="th-content">
                 <span>{{ col.label }}</span>
                 <span v-if="col.sortable" class="sort-icon">
-                  <i
-                    v-if="sortKey === col.key && currentSortOrder === 'asc'"
-                    class="pi pi-sort-up"
-                  ></i>
+                  <i v-if="sortKey === col.key && currentSortOrder === 'asc'" class="pi pi-sort-up"></i>
                   <i
                     v-else-if="sortKey === col.key && currentSortOrder === 'desc'"
                     class="pi pi-sort-down"
