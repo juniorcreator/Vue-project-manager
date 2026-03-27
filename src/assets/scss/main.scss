@@ -38,6 +38,16 @@ button {
   font-family: $font-family;
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 250ms ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 input,
 select,
 textarea {
@@ -84,7 +94,8 @@ textarea {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
+  font-size: $font-size-lg;
   border-radius: $radius-sm;
   transition: all 150ms ease;
   display: inline-flex;

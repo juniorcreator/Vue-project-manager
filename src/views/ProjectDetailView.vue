@@ -147,9 +147,9 @@ const executeDeleteTask = async () => {
             @change="tasksStore.setFilterStatus(($event.target as HTMLSelectElement).value as any)"
           >
             <option value="">All Statuses</option>
-            <option value="active">To Do</option>
+            <option value="todo">To Do</option>
             <option value="in_progress">In Progress</option>
-            <option value="completed">Done</option>
+            <option value="done">Done</option>
           </select>
         </div>
       </div>

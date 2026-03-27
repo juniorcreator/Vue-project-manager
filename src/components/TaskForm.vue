@@ -112,7 +112,7 @@ const handleSubmit = () => {
       </select>
       <span v-if="errors.status" class="field-error">{{ errors.status }}</span>
     </div>
-    <div class="form-group">
+    <div class="form-group task-due">
       <label for="task-due">Due Date <span class="required">*</span></label>
       <input
         id="task-due"
@@ -181,6 +181,13 @@ const handleSubmit = () => {
     justify-content: flex-end;
     padding-top: $space-4;
     border-top: 1px solid $border-color;
+  }
+
+  &.task-due {
+    input {
+      color: #000;
+      background-color: #fff;
+    }
   }
 }
 </style>

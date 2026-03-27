@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { projectsApi } from "@/api/projects.ts";
 import type { Project, ProjectStatus, SortOrder } from "@/types";
 import { applySavedOrder } from "@/utils/storage.ts";
+import toast from "vue3-hot-toast";
 
 export const useProjectsStore = defineStore("projects", () => {
   const projects = ref<Project[]>([]);
@@ -53,7 +54,9 @@ export const useProjectsStore = defineStore("projects", () => {
     try {
       const { data } = await projectsApi.create(payload);
       projects.value.push(data);
+      toast.success("Project created!");
     } catch (error) {
+      toast.error("Failed to create project");
       console.error("Failed to create project", error);
     }
   };
@@ -93,8 +96,10 @@ export const useProjectsStore = defineStore("projects", () => {
       const { data } = await projectsApi.update(id, payload);
       const idExist = projects.value.findIndex((project) => project.id === id);
       if (idExist !== -1) projects.value[idExist] = data;
+      toast.success("Project updated successfully");
       return data;
     } catch (err) {
+      toast.error("Failed to update project");
       console.error("Failed to update project", err);
     }
   };
@@ -103,7 +108,9 @@ export const useProjectsStore = defineStore("projects", () => {
     try {
       await projectsApi.delete(id);
       projects.value = projects.value.filter((project) => project.id !== id);
+      toast.success("Project deleted successfully");
     } catch (error) {
+      toast.error("Failed to delete project");
       console.error("Failed to delete project", error);
     }
   };

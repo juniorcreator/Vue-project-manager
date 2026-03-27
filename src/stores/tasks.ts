@@ -4,6 +4,7 @@ import { tasksApi } from "@/api/tasks.ts";
 import type { ProjectStatus, SortOrder, Task, TaskStatus } from "@/types";
 import { applySavedOrder } from "@/utils/storage.ts";
 import { useProjectsStore } from "@/stores/projects.ts";
+import toast from "vue3-hot-toast";
 
 export const useTasksStore = defineStore("tasks", () => {
   const tasks = ref<Task[]>([]);
@@ -137,9 +138,11 @@ export const useTasksStore = defineStore("tasks", () => {
     try {
       const { data } = await tasksApi.create(payload);
       tasks.value.push(data);
-      syncProjectStats();
+      await syncProjectStats();
+      toast.success("Task created!");
       return data;
     } catch (error) {
+      toast.error("Failed to create task");
       console.error("Failed to create project", error);
     }
   };
@@ -149,9 +152,11 @@ export const useTasksStore = defineStore("tasks", () => {
       const { data } = await tasksApi.update(id, payload);
       const idExist = tasks.value.findIndex((task) => task.id === id);
       if (idExist !== -1) tasks.value[idExist] = data;
-      syncProjectStats();
+      await syncProjectStats();
+      toast.success("Task updateTask!");
       return data;
     } catch (err) {
+      toast.error("Failed to update task");
       console.error("Failed to update task", err);
     }
   };
@@ -160,8 +165,10 @@ export const useTasksStore = defineStore("tasks", () => {
     try {
       await tasksApi.delete(id);
       tasks.value = tasks.value.filter((task) => task.id !== id);
-      syncProjectStats();
+      await syncProjectStats();
+      toast.success("Task deleted!");
     } catch (error) {
+      toast.error(`Failed to delete task with id ${id}`);
       console.error(`Failed to delete task with id ${id}`, error);
     }
   };
@@ -178,7 +185,7 @@ export const useTasksStore = defineStore("tasks", () => {
       tasksApi.update(task.id, { order: task.order, status: task.status }),
     );
     await Promise.all(updatePromises).catch(console.error);
-    syncProjectStats();
+    await syncProjectStats();
   };
 
   const setViewMode = (mode: "table" | "kanban") => {

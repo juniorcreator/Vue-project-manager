@@ -7,14 +7,14 @@ export const columns = [
     label: "Project Name",
     sortable: true,
     width: 280,
-    minWidth: 150,
+    minWidth: 50,
   },
   {
     key: "taskCount",
     label: "Tasks",
     sortable: true,
     width: 60,
-    minWidth: 30,
+    minWidth: 15,
   },
   { key: "status", label: "Status", sortable: true, width: 100, minWidth: 50 },
   {
