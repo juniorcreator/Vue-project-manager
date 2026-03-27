@@ -1,87 +1,9 @@
 @use "@/assets/scss/variables" as *;
 @use '@/assets/scss/mixins' as *;
 
-.btn-icon {
-  background: none;
-  font-size: $font-size-base;
-  cursor: pointer;
-  padding: $space-2;
-  border: none;
-  border-radius: $radius-sm;
-  transition: all  150ms ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: $text-muted;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  &.text-primary:hover {
-    color: $accent-primary;
-    background: rgba($accent-primary, 0.1);
-  }
-
-  &.text-danger:hover {
-    color: $danger;
-    background: rgba($danger, 0.1);
-  }
-}
-
-.text-danger-muted {
-  color: rgba($danger, 0.8);
-  font-size: $font-size-sm;
-  margin-top: $space-2;
-}
-
-.actions-group {
-  display: flex;
-  gap: $space-1;
-}
-
 .projects-page {
   padding-top: $space-10;
   padding-bottom: $space-10;
-}
-
-.filters-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-4;
-  margin-bottom: $space-5;
-}
-
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  background: $bg-glass;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  padding: 0 $space-3;
-  flex: 1;
-  max-width: 300px;
-
-  svg, i {
-    flex-shrink: 0;
-    color: $text-muted;
-  }
-}
-
-input,
-select {
-  flex: 1;
-  padding: $space-3 $space-2;
-  background: transparent;
-  border: none;
-  color: $text-primary;
-  font-size: $font-size-sm;
-  outline: none;
-
-  &::placeholder {
-    color: $text-muted;
-  }
 }
 
 select {
@@ -152,29 +74,5 @@ select {
     color: $text-muted;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-  }
-}
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  color: #64748b;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.08);
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
   }
 }

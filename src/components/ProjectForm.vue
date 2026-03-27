@@ -49,9 +49,7 @@ const handleSubmit = () => {
 <template>
   <form @submit.prevent="handleSubmit" class="project-form" action="">
     <div class="form-group">
-      <label for="project-name"
-        >Project name <span class="required">*</span></label
-      >
+      <label for="project-name">Project name <span class="required">*</span></label>
       <input
         v-model="formData.name"
         id="project-name"
@@ -126,13 +124,5 @@ textarea.error {
 .field-error {
   font-size: $font-size-xs;
   color: $danger;
-}
-
-.form-actions {
-  display: flex;
-  gap: $space-3;
-  justify-content: flex-end;
-  padding-top: $space-4;
-  border-top: 1px solid $border-color;
 }
 </style>
