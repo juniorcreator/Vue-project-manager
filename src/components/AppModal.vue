@@ -59,10 +59,10 @@ const sizeClass = `modal-${props.size || "md"}`;
   overflow: hidden;
 
   &.modal-sm {
-    max-width: 400px;
+    max-width: 380px;
   }
   &.modal-md {
-    max-width: 560px;
+    max-width: 400px;
   }
   &.modal-lg {
     max-width: 720px;

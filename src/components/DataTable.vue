@@ -289,6 +289,10 @@ const stopResize = () => {
   .th-content {
     display: inline-block;
   }
+
+  @media (max-width: $breakpoint-sm) {
+    table-layout: auto;
+  }
 }
 
 .table-row {

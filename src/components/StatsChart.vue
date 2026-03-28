@@ -69,8 +69,15 @@ const chartOptions = {
 </template>
 
 <style scoped lang="scss">
+@use "@/assets/scss/variables" as *;
+
 .chart-wrapper {
   max-width: 240px;
   margin: 0 auto;
+
+  @media (max-width: $breakpoint-sm) {
+    max-width: 200px;
+    flex-direction: column;
+  }
 }
 </style>

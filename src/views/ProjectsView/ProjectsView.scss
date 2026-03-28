@@ -18,6 +18,11 @@ select {
   gap: $space-6;
   margin-bottom: $space-8;
   align-items: center;
+
+  @media (max-width: $breakpoint-sm) {
+    display: block;
+    flex-direction: column;
+  }
 }
 
 .stats-card {
@@ -33,12 +38,21 @@ select {
     margin-bottom: $space-4;
     text-align: center;
   }
+
+  @media (max-width: $breakpoint-sm) {
+    margin-bottom: $space-3;
+    flex-direction: column;
+  }
 }
 
 .stats-numbers {
   display: flex;
   gap: $space-4;
   flex-wrap: wrap;
+
+  @media (max-width: $breakpoint-sm) {
+    gap: $space-2;
+  }
 }
 
 .stat-item {
@@ -74,5 +88,9 @@ select {
     color: $text-muted;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $space-1 $space-2;
   }
 }
