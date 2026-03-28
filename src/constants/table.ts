@@ -24,7 +24,7 @@ export const columns = [
     width: 150,
     minWidth: 70,
   },
-  { key: "actions", label: "Actions", sortable: true, width: 60, minWidth: 50 },
+  { key: "actions", label: "Actions", sortable: false, width: 25, minWidth: 20 },
 ];
 export const tasksColumns = [
   { key: "id", label: "ID", sortable: true, width: 70, minWidth: 50 },

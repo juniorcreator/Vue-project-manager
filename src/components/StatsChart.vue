@@ -22,16 +22,8 @@ const chartData = computed(() => {
     datasets: [
       {
         data: [counts.todo, counts.in_progress, counts.done],
-        backgroundColor: [
-          "rgba(245, 158, 11, 0.8)",
-          "rgba(99, 102, 241, 0.8)",
-          "rgba(74, 222, 128, 0.8)",
-        ],
-        borderColor: [
-          "rgba(245, 158, 11, 1)",
-          "rgba(99, 102, 241, 1)",
-          "rgba(74, 222, 128, 1)",
-        ],
+        backgroundColor: ["rgba(245, 158, 11, 0.8)", "rgba(99, 102, 241, 0.8)", "rgba(74, 222, 128, 0.8)"],
+        borderColor: ["rgba(245, 158, 11, 1)", "rgba(99, 102, 241, 1)", "rgba(74, 222, 128, 1)"],
         borderWidth: 2,
         hoverOffset: 8,
       },
@@ -78,7 +70,7 @@ const chartOptions = {
 
 <style scoped lang="scss">
 .chart-wrapper {
-  max-width: 260px;
+  max-width: 240px;
   margin: 0 auto;
 }
 </style>
