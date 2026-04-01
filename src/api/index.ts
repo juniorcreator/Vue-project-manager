@@ -4,7 +4,7 @@ import toast from "vue3-hot-toast";
 const api = axios.create({
   baseURL: "https://69c3d544b780a9ba03e81187.mockapi.io/api",
   headers: { "Content-Type": "application/json" },
-  timeout: 600,
+  timeout: 5000,
 });
 
 api.interceptors.response.use(
