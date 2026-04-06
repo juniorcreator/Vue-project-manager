@@ -221,6 +221,7 @@ export const useTasksStore = defineStore("tasks", () => {
     assignees,
     filteredAndSortedTasks,
     tasksByStatus,
+    syncProjectStats,
     setFilterAssignee,
     setViewMode,
     reorderTasks,

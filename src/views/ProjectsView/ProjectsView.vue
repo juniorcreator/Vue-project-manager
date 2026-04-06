@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { tasksApi } from "@/api/tasks.ts";
 import { useProjectsStore } from "@/stores/projects.ts";
+import { useTasksStore } from "@/stores/tasks.ts";
 import type { Project, ProjectStatus, Task } from "@/types";
 import { columns } from "@/constants/table.ts";
 import AppModal from "@/components/AppModal.vue";
@@ -14,6 +15,7 @@ import { formatDate } from "@/utils/formatters.ts";
 
 const router = useRouter();
 const projectsStore = useProjectsStore();
+const tasksStore = useTasksStore();
 
 const showModal = ref(false);
 const showDeleteModal = ref(false);
@@ -30,6 +32,14 @@ onMounted(async () => {
     console.error("onMounted error occurred", error);
   }
 });
+
+watch(
+  () => projectsStore.projects,
+  () => {
+    allTasks.value = tasksStore.tasks;
+  },
+  { deep: true },
+);
 
 const handleReorder = (rows: Project[]) => {
   projectsStore.reorderProjects(rows);
@@ -107,9 +117,7 @@ const handleCreateOrUpdate = async (data: { name: string; description: string })
           <span class="stat-label">Total Tasks</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value todo">{{
-            allTasks.filter((task) => task.status === "todo").length
-          }}</span>
+          <span class="stat-value todo">{{ allTasks.filter((task) => task.status === "todo").length }}</span>
           <span class="stat-label">To Do</span>
         </div>
         <div class="stat-item">
@@ -119,9 +127,7 @@ const handleCreateOrUpdate = async (data: { name: string; description: string })
           <span class="stat-label">In Progress</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value done">{{
-            allTasks.filter((task) => task.status === "done").length
-          }}</span>
+          <span class="stat-value done">{{ allTasks.filter((task) => task.status === "done").length }}</span>
           <span class="stat-label">Done</span>
         </div>
       </div>
@@ -139,11 +145,7 @@ const handleCreateOrUpdate = async (data: { name: string; description: string })
       </div>
       <div class="filter-group">
         <select
-          @change="
-            projectsStore.setFilterStatus(
-              ($event.target as HTMLSelectElement).value as ProjectStatus,
-            )
-          "
+          @change="projectsStore.setFilterStatus(($event.target as HTMLSelectElement).value as ProjectStatus)"
           :value="projectsStore.filterStatus"
         >
           <option value="">All Statuses</option>
@@ -197,11 +199,7 @@ const handleCreateOrUpdate = async (data: { name: string; description: string })
       </template>
     </DataTable>
 
-    <AppModal
-      :show="showModal"
-      :title="editingProject ? 'Edit Project' : 'New Project'"
-      @close="closeModal"
-    >
+    <AppModal :show="showModal" :title="editingProject ? 'Edit Project' : 'New Project'" @close="closeModal">
       <ProjectForm :editing="editingProject" @submit="handleCreateOrUpdate" @cancel="closeModal" />
     </AppModal>
     <AppModal :show="showDeleteModal" title="Delete Project" @close="showDeleteModal = false">

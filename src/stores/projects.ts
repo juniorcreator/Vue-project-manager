@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { projectsApi } from "@/api/projects.ts";
+import { useTasksStore } from "@/stores/tasks.ts";
+import { tasksApi } from "@/api/tasks.ts";
 import type { Project, ProjectStatus, SortOrder } from "@/types";
 import { applySavedOrder } from "@/utils/storage.ts";
 import toast from "vue3-hot-toast";
@@ -105,9 +107,13 @@ export const useProjectsStore = defineStore("projects", () => {
   };
 
   const deleteProject = async (id: string) => {
+    const tasksStore = useTasksStore();
     try {
+      const ids = await tasksApi.deleteByProject(id);
       await projectsApi.delete(id);
+      await tasksStore.syncProjectStats();
       projects.value = projects.value.filter((project) => project.id !== id);
+      tasksStore.tasks = tasksStore.tasks.filter((task) => !ids!.includes(task.id));
       toast.success("Project deleted successfully");
     } catch (error) {
       toast.error("Failed to delete project");
