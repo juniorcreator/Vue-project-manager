@@ -35,8 +35,9 @@ onMounted(async () => {
 
 watch(
   () => projectsStore.projects,
-  () => {
-    allTasks.value = tasksStore.tasks;
+  async () => {
+    const { data } = await tasksApi.getAll();
+    allTasks.value = data;
   },
   { deep: true },
 );
