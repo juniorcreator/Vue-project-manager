@@ -2,7 +2,6 @@
 import { ref, onMounted, watch } from "vue";
 import { tasksApi } from "@/api/tasks.ts";
 import { useProjectsStore } from "@/stores/projects.ts";
-import { useTasksStore } from "@/stores/tasks.ts";
 import type { Project, ProjectStatus, Task } from "@/types";
 import { columns } from "@/constants/table.ts";
 import AppModal from "@/components/AppModal.vue";
@@ -15,7 +14,6 @@ import { formatDate } from "@/utils/formatters.ts";
 
 const router = useRouter();
 const projectsStore = useProjectsStore();
-const tasksStore = useTasksStore();
 
 const showModal = ref(false);
 const showDeleteModal = ref(false);
