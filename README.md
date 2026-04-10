@@ -1,6 +1,6 @@
 # ProjectFlow — Project & Task Management SPA
 
-[**🚀 Live Demo**]() *((https://vue-project-manager.vercel.app/projects))*
+[**🚀 Live Demo**]() *((https://vue-project-manager.vercel.app))*
 
 A modern, responsive Single Page Application for managing projects and tasks, built with Vue.js 3, TypeScript, and Pinia.
 
